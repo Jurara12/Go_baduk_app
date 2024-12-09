@@ -8,10 +8,17 @@ const BOARD_SIZE = 19;
 const TILE_SIZE = canvas.width / BOARD_SIZE;
 
 // Game state
-let board = Array.from(Array(BOARD_SIZE), () => Array(BOARD_SIZE).fill(0));
+let board = Array.from(Array(BOARD_SIZE), () => Array(BOARD_SIZE).fill(0));  // 0 = empty, 1 = Black, 2 = White
 let currentPlayer = 1;  // 1 = Black, 2 = White
 
-// Draw the Go board
+// Star points (hoshi points) on a 19x19 board
+const starPoints = [
+    [3, 3], [9, 9], [15, 15],
+    [3, 15], [15, 3],
+    [9, 3], [3, 9], [15, 9], [9, 15]
+];
+
+// Draw the Go board with star points and coordinates
 function drawBoard() {
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 2;
@@ -28,7 +35,32 @@ function drawBoard() {
         ctx.moveTo(TILE_SIZE / 2 + i * TILE_SIZE, TILE_SIZE / 2);
         ctx.lineTo(TILE_SIZE / 2 + i * TILE_SIZE, canvas.height - TILE_SIZE / 2);
         ctx.stroke();
+
+        // Draw coordinates on the edges
+        ctx.font = "14px Arial";
+        ctx.fillStyle = "#333";
+        if (i < BOARD_SIZE) {
+            // Draw row numbers
+            ctx.fillText(i + 1, TILE_SIZE / 2 - 10, TILE_SIZE / 2 + i * TILE_SIZE);
+            // Draw column letters
+            ctx.fillText(String.fromCharCode(65 + i), TILE_SIZE / 2 + i * TILE_SIZE - 10, TILE_SIZE / 2 - 10);
+        }
     }
+
+    // Mark the star points (hoshi points)
+    starPoints.forEach(point => {
+        const x = point[0];
+        const y = point[1];
+        ctx.beginPath();
+        ctx.arc(
+            TILE_SIZE / 2 + x * TILE_SIZE, 
+            TILE_SIZE / 2 + y * TILE_SIZE, 
+            TILE_SIZE / 6, 
+            0, Math.PI * 2
+        );
+        ctx.fillStyle = "#000";
+        ctx.fill();
+    });
 }
 
 // Draw a stone
@@ -44,6 +76,27 @@ function drawStone(x, y, player) {
     ctx.fill();
     ctx.stroke();
 }
+
+// Handle user clicks to place stones
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Calculate intersection coordinates
+    const x = Math.floor(mouseX / TILE_SIZE);
+    const y = Math.floor(mouseY / TILE_SIZE);
+
+    // Ensure the spot is empty
+    if (board[y][x] === 0) {
+        // Place the stone
+        board[y][x] = currentPlayer;
+        drawStone(x, y, currentPlayer);
+
+        // Switch players
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+    }
+});
 
 // Handle SGF file upload
 document.getElementById("sgf-file").addEventListener("change", readSGFFile);
