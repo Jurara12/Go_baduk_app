@@ -1,0 +1,28 @@
+/* Basic Page Styling */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Canvas Styling */
+canvas {
+    background-color: #dcbf7a;
+    border: 5px solid #333;
+    margin-top: 20px;
+}
+
+#sgf-file {
+    margin: 20px;
+}
+
+pre {
+    background: #eee;
+    padding: 10px;
+    text-align: left;
+    display: inline-block;
+}
